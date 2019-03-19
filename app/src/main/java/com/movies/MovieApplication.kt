@@ -5,8 +5,10 @@ import com.movies.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 
+
 @SuppressLint("unused")
 class MovieApplication : DaggerApplication() {
+
     private val appComponent = DaggerAppComponent.builder()
         .application(this)
         .build()
