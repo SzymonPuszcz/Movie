@@ -11,7 +11,8 @@ import com.squareup.picasso.Picasso
 fun ImageView.setImageUrl(url: String?) {
     Picasso.get()
         .load(url)
-        .placeholder(R.drawable.ic_launcher_background)
+        .placeholder(R.drawable.progress_animation)
+        .error(R.drawable.error_placeholder)
         .fit()
         .centerInside()
         .into(this, PicassoCallbackLogger())
