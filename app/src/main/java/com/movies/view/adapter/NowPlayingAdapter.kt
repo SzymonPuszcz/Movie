@@ -13,8 +13,9 @@ class NowPlayingAdapter : RecyclerView.Adapter<NowPlayingViewHolder>() {
     private var movies: List<Movie>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NowPlayingViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
         val binding = DataBindingUtil.inflate<NowPlayingItemRowBinding>(
-            LayoutInflater.from(parent.context),
+            inflater,
             R.layout.now_playing_item_row,
             parent,
             false

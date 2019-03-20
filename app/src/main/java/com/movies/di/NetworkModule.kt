@@ -1,6 +1,7 @@
 package com.movies.di
 
 import androidx.annotation.NonNull
+import com.movies.BuildConfig
 import com.movies.api.RequestInterceptor
 import com.movies.service.MovieService
 import dagger.Module
@@ -25,7 +26,7 @@ class NetworkModule {
     fun provideRetrofit(@NonNull okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://api.themoviedb.org/3/")
+            .baseUrl(BuildConfig.MOVIEDB_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

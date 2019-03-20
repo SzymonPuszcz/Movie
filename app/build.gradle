@@ -18,6 +18,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            buildConfigField("String", "MOVIEDB_ADDRESS", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "MOVIEDB_API_KEY", "\"9582e8f9dc236fc197f52c2622e66591\"")
+            buildConfigField("String", "MOVIEDB_IMAGE_ADDRESS", "\"https://image.tmdb.org/t/p/original/\"")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
