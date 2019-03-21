@@ -11,6 +11,8 @@ buildscript {
         rxAndroidVersion = "2.0.2"
         retrofitRxAndroidVersion = "2.4.0"
         archCompomentVersion = '2.0.0'
+        androidXVersion = '1.0.0'
+        picassoVersion = '2.71828'
     }
     repositories {
         google()
