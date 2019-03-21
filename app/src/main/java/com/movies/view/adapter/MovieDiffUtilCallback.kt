@@ -3,20 +3,21 @@ package com.movies.view.adapter
 import androidx.recyclerview.widget.DiffUtil
 import com.movies.model.Movie
 
-class MovieDiffUtil(private val movies: List<Movie>) : DiffUtil.Callback() {
+class MovieDiffUtilCallback(private val newMovies: List<Movie>,
+                            private val oldMovies: List<Movie>) : DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return movies[oldItemPosition] == movies[newItemPosition]
+        return oldMovies[oldItemPosition] == newMovies[newItemPosition]
     }
 
     override fun getOldListSize(): Int {
-        return movies.size
+        return oldMovies.size
     }
 
     override fun getNewListSize(): Int {
-        return movies.size
+        return newMovies.size
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return movies[oldItemPosition] == movies[newItemPosition]
+        return oldMovies[oldItemPosition] == newMovies[newItemPosition]
     }
 }

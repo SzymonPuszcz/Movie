@@ -1,6 +1,7 @@
 package com.movies.view.activity
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -25,6 +26,10 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         initializeUI()
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
     }
 
     private fun initializeUI() {
@@ -55,9 +60,16 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
             .commit()
     }
 
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        outState?.putString(QUERY, searchView.query.toString())
+        super.onSaveInstanceState(outState, outPersistentState)
+    }
+
+    private lateinit var searchView: SearchView
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
-        val searchView = menu?.findItem(R.id.action_search)?.actionView as SearchView
+        searchView = menu?.findItem(R.id.action_search)?.actionView as SearchView
         searchView.setOnQueryTextListener(nowPlayingFragment)
         return true
     }
@@ -68,5 +80,6 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     companion object {
         var TAG: String = DashboardActivity::class.java.simpleName
+        val QUERY: String = "QUERY"
     }
 }

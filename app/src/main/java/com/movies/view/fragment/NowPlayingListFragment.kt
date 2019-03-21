@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -41,8 +43,13 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     ): View? {
         val binding = getDataBinding(inflater, container)
         configureNowPlayingList(binding, savedInstanceState)
-
+        observeViewModel()
         return binding.root
+    }
+
+    private fun observeViewModel() {
+        observeLiveData(viewModel.movies) { e -> updateMovies(e) }
+        observeLiveData(viewModel.filteredMovies) { e -> updateMovies(e) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,22 +89,15 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun getRecyclerLayoutManager(): GridLayoutManager {
         val currentOrientation = resources.configuration.orientation
         return if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            GridLayoutManager(activity, 4)
+            GridLayoutManager(activity, LANDSCAPE_NUM_OF_COLUMNS)
         } else {
-            GridLayoutManager(activity, 2)
+            GridLayoutManager(activity, PORTRAIT_NUM_OF_COLUMNS)
         }
     }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel.movieListLiveData.observe(this, Observer {
-            it?.let { movies -> updateMovies(movies) }
-        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -109,18 +109,30 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
         adapter.setMovieList(movies)
     }
 
-    override fun onQueryTextSubmit(p0: String?): Boolean {
-        adapter.filter.filter(p0)
+    override fun onQueryTextSubmit(input: String?): Boolean {
+        filterMovies(input)
         return false
     }
 
-    override fun onQueryTextChange(p0: String?): Boolean {
-        adapter.filter.filter(p0)
+    override fun onQueryTextChange(input: String?): Boolean {
+        filterMovies(input)
         return false
+    }
+
+    private fun filterMovies(input: String?) {
+        input?.let { viewModel.search(it) }
     }
 
     companion object {
         var TAG: String = NowPlayingListFragment::class.java.simpleName
         const val ADAPTER = "ADAPTER"
+        const val LANDSCAPE_NUM_OF_COLUMNS = 4
+        const val PORTRAIT_NUM_OF_COLUMNS = 2
     }
+}
+
+inline fun <T> LifecycleOwner.observeLiveData(data: LiveData<T>, crossinline onChanged: (T) -> Unit) {
+    data.observe(this, Observer {
+        it?.let { value -> onChanged(value) }
+    })
 }
