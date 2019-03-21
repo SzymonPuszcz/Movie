@@ -21,7 +21,8 @@ constructor(
 
     val movies: LiveData<List<Movie>> = discoverRepository.loadNowPlayingMovies()
     val filteredMovies: MutableLiveData<List<Movie>> = MutableLiveData()
-    val querySearch: Subject<String> = PublishSubject.create()
+    private val querySearch: Subject<String> = PublishSubject.create()
+    private val restoreSearch: Subject<String> = PublishSubject.create()
     private val subscriptions = CompositeDisposable()
 
     init {
@@ -31,14 +32,33 @@ constructor(
             }
                 .subscribe { newFiltered ->
                     filteredMovies.value = newFiltered
-                }
+                },
+            restoreSearch.flatMap { query ->
+                shouldRestoreSearch(query)
+                    .filter { restoreSearch -> restoreSearch }
+                    .map { query }
+            }
+                .subscribe { query -> search(query) }
         )
+
+    }
+
+    fun restoreFiltering(query: String) {
+        restoreSearch.onNext(query)
+    }
+
+    private fun shouldRestoreSearch(query: String): Observable<Boolean> {
+        return Observable.just(filterMovies(query)?.size != movies.value?.size)
     }
 
     fun search(query: String) {
         querySearch.onNext(query)
     }
+
     private fun filter(query: String): Observable<List<Movie>?>? = Observable.just(
-        movies.value?.filter { it.title.contains(query, ignoreCase = true) }?.toList()
+        filterMovies(query)
     )
+
+    private fun filterMovies(query: String) =
+        movies.value?.filter { it.title.contains(query, ignoreCase = true) }?.toList()
 }

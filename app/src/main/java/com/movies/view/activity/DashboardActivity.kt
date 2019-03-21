@@ -1,7 +1,6 @@
 package com.movies.view.activity
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -22,14 +21,12 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     lateinit var nowPlayingFragment: NowPlayingListFragment
 
+    private var lastQuery: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         initializeUI()
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
     }
 
     private fun initializeUI() {
@@ -46,13 +43,13 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
         if (restoredFragment != null) {
             nowPlayingFragment = restoredFragment as NowPlayingListFragment
         } else {
-            addNowPlayingFragment()
+            addNewNowPlayingFragment()
         }
     }
 
     private fun findNowPlayingFragment() = supportFragmentManager.findFragmentByTag(NowPlayingListFragment.TAG)
 
-    private fun addNowPlayingFragment() {
+    private fun addNewNowPlayingFragment() {
         nowPlayingFragment = NowPlayingListFragment()
         supportFragmentManager
             .beginTransaction()
@@ -60,18 +57,37 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
             .commit()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        outState?.putString(QUERY, searchView.query.toString())
-        super.onSaveInstanceState(outState, outPersistentState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(LAST_QUERY, searchView.query.toString())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        lastQuery = savedInstanceState?.getString(LAST_QUERY)
     }
 
     private lateinit var searchView: SearchView
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
-        searchView = menu?.findItem(R.id.action_search)?.actionView as SearchView
+        initializeSearchView(menu)
+        if (!lastQuery.isNullOrEmpty())
+            restoreSearch(menu)
         searchView.setOnQueryTextListener(nowPlayingFragment)
         return true
+    }
+
+    private fun restoreSearch(menu: Menu?) {
+        val menuItem = menu?.findItem(R.id.action_search)
+        menuItem?.expandActionView()
+        searchView.setQuery(lastQuery, true)
+        searchView.clearFocus()
+    }
+
+    private fun initializeSearchView(menu: Menu?) {
+        val menuItem = menu?.findItem(R.id.action_search)
+        searchView = menuItem?.actionView as SearchView
     }
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
@@ -80,6 +96,6 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     companion object {
         var TAG: String = DashboardActivity::class.java.simpleName
-        val QUERY: String = "QUERY"
+        const val LAST_QUERY: String = "LAST_QUERY"
     }
 }

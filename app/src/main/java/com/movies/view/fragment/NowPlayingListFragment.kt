@@ -9,13 +9,11 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.movies.R
 import com.movies.databinding.FragmentNowPlayingListBinding
+import com.movies.extension.observeLiveData
 import com.movies.model.Movie
 import com.movies.view.adapter.NowPlayingAdapter
 import com.movies.viewmodel.DashboardViewModel
@@ -35,6 +33,7 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private lateinit var adapter: NowPlayingAdapter
+    private var lastQuery: String? = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +54,14 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
+        savedInstanceState?.let { restoreInstance(it) }
+    }
+
+    private fun restoreInstance(savedInstanceState: Bundle) {
+        lastQuery = savedInstanceState.getString(LAST_QUERY)
+        lastQuery?.let {
+            viewModel.restoreFiltering(lastQuery!!)
+        }
     }
 
     private fun getDataBinding(
@@ -103,6 +110,7 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putSerializable(ADAPTER, adapter)
+        outState.putString(LAST_QUERY, lastQuery)
     }
 
     private fun updateMovies(movies: List<Movie>) {
@@ -110,11 +118,13 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextSubmit(input: String?): Boolean {
+        lastQuery = input
         filterMovies(input)
         return false
     }
 
     override fun onQueryTextChange(input: String?): Boolean {
+        lastQuery = input
         filterMovies(input)
         return false
     }
@@ -126,13 +136,8 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     companion object {
         var TAG: String = NowPlayingListFragment::class.java.simpleName
         const val ADAPTER = "ADAPTER"
+        const val LAST_QUERY = "LAST_QUERY"
         const val LANDSCAPE_NUM_OF_COLUMNS = 4
         const val PORTRAIT_NUM_OF_COLUMNS = 2
     }
-}
-
-inline fun <T> LifecycleOwner.observeLiveData(data: LiveData<T>, crossinline onChanged: (T) -> Unit) {
-    data.observe(this, Observer {
-        it?.let { value -> onChanged(value) }
-    })
 }
