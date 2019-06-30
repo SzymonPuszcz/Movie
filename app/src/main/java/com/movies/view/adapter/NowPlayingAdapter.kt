@@ -6,14 +6,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.movies.databinding.NowPlayingItemRowBinding
-import com.movies.model.Movie
+import com.movies.model.NowPlayingMovie
 import com.movies.view.viewholder.NowPlayingViewHolder
 import java.io.Serializable
 
 
 class NowPlayingAdapter : RecyclerView.Adapter<NowPlayingViewHolder>(), Serializable {
 
-    private var movies: List<Movie>? = null
+    private var nowPlayingMovies: List<NowPlayingMovie>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NowPlayingViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -27,22 +27,22 @@ class NowPlayingAdapter : RecyclerView.Adapter<NowPlayingViewHolder>(), Serializ
     }
 
     override fun getItemCount(): Int {
-        return movies?.size ?: 0
+        return nowPlayingMovies?.size ?: 0
     }
 
     override fun onBindViewHolder(holder: NowPlayingViewHolder, position: Int) {
-        holder.binding.movie = movies?.get(position)
+        holder.binding.nowPlayingMovie = nowPlayingMovies?.get(position)
         holder.binding.executePendingBindings()
     }
 
-    fun setMovieList(newMoviesList: List<Movie>) {
-        movies = newMoviesList
+    fun setMovieList(newMoviesList: List<NowPlayingMovie>) {
+        nowPlayingMovies = newMoviesList
         notifyDataSetChanged()
         calculateMoviesDiff(newMoviesList)
     }
 
-    private fun calculateMoviesDiff(newMoviesList: List<Movie>) {
-        this.movies?.let {
+    private fun calculateMoviesDiff(newMoviesList: List<NowPlayingMovie>) {
+        this.nowPlayingMovies?.let {
             val diffResult = DiffUtil.calculateDiff(MovieDiffUtilCallback(newMoviesList, it))
             diffResult.dispatchUpdatesTo(this)
         }

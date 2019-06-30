@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.movies.R
 import com.movies.databinding.FragmentNowPlayingListBinding
 import com.movies.extension.observeLiveData
-import com.movies.model.Movie
+import com.movies.model.NowPlayingMovie
 import com.movies.view.adapter.NowPlayingAdapter
 import com.movies.viewmodel.DashboardViewModel
 import com.movies.viewmodel.ViewModelFactory
@@ -47,7 +47,7 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun observeViewModel() {
-        observeLiveData(viewModel.movies) { e -> updateMovies(e) }
+        observeLiveData(viewModel.movies) { e -> updateMovies(e.data) }
         observeLiveData(viewModel.filteredMovies) { e -> updateMovies(e) }
     }
 
@@ -113,8 +113,10 @@ class NowPlayingListFragment : Fragment(), SearchView.OnQueryTextListener {
         outState.putString(LAST_QUERY, lastQuery)
     }
 
-    private fun updateMovies(movies: List<Movie>) {
-        adapter.setMovieList(movies)
+    private fun updateMovies(nowPlayingMovies: List<NowPlayingMovie>?) {
+        nowPlayingMovies?.let {
+            adapter.setMovieList(it)
+        }
     }
 
     override fun onQueryTextSubmit(input: String?): Boolean {

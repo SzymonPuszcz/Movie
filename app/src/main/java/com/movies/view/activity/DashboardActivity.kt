@@ -21,7 +21,7 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     lateinit var nowPlayingFragment: NowPlayingListFragment
 
-    private var lastQuery: String? = null
+    private lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -39,15 +39,8 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     private fun configureNowPlayingFragment() {
-        val restoredFragment = findNowPlayingFragment()
-        if (restoredFragment != null) {
-            nowPlayingFragment = restoredFragment as NowPlayingListFragment
-        } else {
-            addNewNowPlayingFragment()
-        }
+         addNewNowPlayingFragment()
     }
-
-    private fun findNowPlayingFragment() = supportFragmentManager.findFragmentByTag(NowPlayingListFragment.TAG)
 
     private fun addNewNowPlayingFragment() {
         nowPlayingFragment = NowPlayingListFragment()
@@ -57,32 +50,11 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
             .commit()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(LAST_QUERY, searchView.query.toString())
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
-        super.onRestoreInstanceState(savedInstanceState)
-        lastQuery = savedInstanceState?.getString(LAST_QUERY)
-    }
-
-    private lateinit var searchView: SearchView
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         initializeSearchView(menu)
-        if (!lastQuery.isNullOrEmpty())
-            restoreSearch(menu)
         searchView.setOnQueryTextListener(nowPlayingFragment)
         return true
-    }
-
-    private fun restoreSearch(menu: Menu?) {
-        val menuItem = menu?.findItem(R.id.action_search)
-        menuItem?.expandActionView()
-        searchView.setQuery(lastQuery, true)
-        searchView.clearFocus()
     }
 
     private fun initializeSearchView(menu: Menu?) {
@@ -96,6 +68,5 @@ class DashboardActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     companion object {
         var TAG: String = DashboardActivity::class.java.simpleName
-        const val LAST_QUERY: String = "LAST_QUERY"
     }
 }

@@ -66,4 +66,9 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitRxAndroidVersion"
 
     implementation "com.squareup.picasso:picasso:$picassoVersion"
+
+    implementation "com.jakewharton.timber:timber:$timberVersion"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
 }

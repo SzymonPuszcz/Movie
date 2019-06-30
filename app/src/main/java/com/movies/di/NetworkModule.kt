@@ -4,6 +4,7 @@ import androidx.annotation.NonNull
 import com.movies.BuildConfig
 import com.movies.api.RequestInterceptor
 import com.movies.service.MovieService
+import com.movies.util.LiveDataCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -27,6 +28,7 @@ class NetworkModule {
         return Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl(BuildConfig.MOVIEDB_ADDRESS)
+            .addCallAdapterFactory(LiveDataCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

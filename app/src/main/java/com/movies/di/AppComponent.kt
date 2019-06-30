@@ -14,7 +14,8 @@ import javax.inject.Singleton
         AndroidInjectionModule::class,
         ActivityModule::class,
         NetworkModule::class,
-        ViewModelModule::class]
+        ViewModelModule::class,
+        RoomModule::class]
 )
 
 interface AppComponent : AndroidInjector<DaggerApplication> {
@@ -24,8 +25,8 @@ interface AppComponent : AndroidInjector<DaggerApplication> {
         fun application(application: Application): AppComponent.Builder
 
         fun build(): AppComponent
+
     }
 
     override fun inject(instance: DaggerApplication)
-
 }
